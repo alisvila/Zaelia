@@ -2,11 +2,12 @@
   "name": "push-server",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "index.js",
   "type": "module",
   "scripts": {
-    "clean": "[ -e .data/db.json ] && rm .data/db.json",
-    "start": "node index.js;"
+    "clean": "",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "author": "",
   "license": "ISC",
@@ -19,5 +20,8 @@
     "lowdb": "^5.1.0",
     "mongoose": "^6.9.1",
     "web-push": "^3.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
   }
 }

@@ -1,55 +1,59 @@
 import express from "express";
-import path from "path";
-// import sendNotifications from "../utils/send";
-import userModel from "../models/user.js";
-import webpush from "web-push";
+import sendNotifications from "../utils/send.js";
+import UserModel from "../models/user.js";
 
 const app = express.Router();
 
 app.post("/subscribe", async (req, res) => {
-  //   console.log(`Subscribing ${req.body.endpoint}`);
+  const username = req.body.username || "ali";
 
-  const newSubscription = await userModel.create({ ...req.body });
-  console.log(newSubscription);
-  const test = {
-    endpoint:
-      "https://fcm.googleapis.com/fcm/send/dtSy3aV3ir8:APA91bFgYBE-us11WN-6zEpWduN7Cy6gMFAzoWE7n28KT-knJpiofkOyB39B6ZSb9kuJ6f17Bfd_wtCvFeYkvSGPpts-o00VskSqPzI_NJQMM5EdveuvBvGGMaStE58XkdRxAKUjB8WI",
-    expirationTime: null,
-    keys: {
-      p256dh:
-        "BE-3E5Ip8nf22Vegxh6rIY3mBs2zAKDEe9b2ILnLQNRv-wJXwdY65rbu6sB3zuozLUXnXuDt64PxFcXNfxWgCjw",
-      auth: "Xe-vJK3CUXiOFFbXi5NPTg",
-    },
-  };
+  console.log(`Subscribing ${req.body.endpoint}`);
+  //   const newSubscription = await userModel.create({ ...req.body });
+  let oldOrNew;
 
-  const options = {
-    vapidDetails: {
-      subject: "mailto:myemail@example.com",
-      publicKey: process.env.VAPID_PUBLIC_KEY,
-      privateKey: process.env.VAPID_PRIVATE_KEY,
-    },
-  };
   try {
-    await webpush.sendNotification(
-      test,
-      JSON.stringify({
-        title: "Hello from server",
-        description: "this message is coming from the server",
-        image:
-          "https://cdn2.vectorstock.com/i/thumb-large/94/66/emoji-smile-icon-symbol-smiley-face-vector-26119466.jpg",
-      }),
-      options
-    );
-    // res.sendStatus(200);
-  } catch (error) {
-    console.log(error);
-    res.sendStatus(500);
+    const newSubscription = new UserModel({
+      username: "ali",
+      subscribe: { ...req.body },
+    });
+    oldOrNew = await newSubscription.save();
+  } catch (e) {
+    // TODO: check for error code 11000 or sth
+    oldOrNew = await UserModel.findOne({
+      username: new RegExp(`${username}`, "i"),
+    });
   }
 
-  res.sendStatus(200);
+  if (!oldOrNew.subscribe) {
+    await UserModel.updateOne({
+      subscribe: { ...req.body },
+    });
+  }
+
+  try {
+    await sendNotifications(oldOrNew.subscribe, {
+      title: "hello",
+      description: "hello from server",
+    });
+    res.sendStatus(200).json(oldOrNew);
+  } catch (error) {
+    res.sendStatus(500).json(error);
+  }
 });
 
-app.post("/remove-subscription", (request, response) => {
+app.post("/remove-sub", async (request, response) => {
+  const username = request.body.username || "ali";
+  //   const newSub = await UserModel.deleteOne({ username: /ali/i });
+  const newSub = await UserModel.findOne({
+    username: new RegExp(`${username}`, "i"),
+  });
+  newSub.subscribe = undefined;
+  try {
+    await newSub.save();
+  } catch (e) {
+    response.statusCode(500).json(e);
+  }
+
   console.log(`Unsubscribing ${request.body.endpoint}`);
   response.sendStatus(200);
 });
