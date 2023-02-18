@@ -18,17 +18,17 @@
             'BBox7nFsbveSrH0C2xmOJZxkY0miaRTKh29Vlm1fCBb0A9Y_tp7j_a5TxKat0a3V7TssF3tzEHjX67Q1Q-7oTM4'
         });
 
-        const res = await fetch('//localhost:8080/subscribe', {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json'
-            },
-            body: {
-                username: 'filan',
-                subscribe: JSON.stringify(push)
-            }
-        })
-        console.log(JSON.stringify(push), res);
+        // const res = await fetch('//localhost:8080/subscribe', {
+        //     method: 'POST',
+        //     headers: {
+        //     'Content-Type': 'application/json'
+        //     },
+        //     body: {
+        //         username: 'filan',
+        //         subscribe: JSON.stringify(push)
+        //     }
+        // })
+        console.log(JSON.stringify(push));
       }
 
       if ('serviceWorker' in navigator) {
