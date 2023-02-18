@@ -13,7 +13,7 @@ const UserSchema = new Schema({
 
 const Subscribe = new Schema({
   endpoint: String,
-  expirationTime: Nymber,
+  expirationTime: Number,
   keys: {
     p256dh: String,
     auth: String,

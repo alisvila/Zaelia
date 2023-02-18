@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "clean": "[ -e .data/db.json ] && rm .data/db.json",
-    "start": "npm run clean; node server.js;"
+    "start": "node index.js;"
   },
   "author": "",
   "license": "ISC",

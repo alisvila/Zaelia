@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
-import sendNotifications from "../utils/send";
-import userModel from "./model/user";
+// import sendNotifications from "../utils/send";
+import userModel from "../models/user.js";
 
 const app = express.Router();
 
@@ -57,3 +57,5 @@ app.get("/", (request, response) => {
   console.log(process.cwd());
   response.sendFile(path.join(process.cwd(), "/views/index.html"));
 });
+
+export default app;

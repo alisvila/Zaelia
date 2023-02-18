@@ -1,16 +1,17 @@
-const express = require("express");
+import express from "express";
 import bodyparser from "body-parser";
 import mongoose, { mongo } from "mongoose";
-const indexRouter = require("./routes/index");
-const allowCrossDomain = require("./routes/middleware/cors");
+import indexRouter from "./routes/index.js";
+// const indexRouter = require("./routes/index");
+// const allowCrossDomain = require("./routes/middleware/cors");
 
 const app = express();
-const port = 3000;
+const port = 3030;
 app.set("view engine", "ejs");
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-app.use(allowCrossDomain);
+// app.use(allowCrossDomain);
 app.use("/", indexRouter);
 
 app.use((req, res) => {
