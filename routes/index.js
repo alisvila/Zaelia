@@ -2,24 +2,36 @@ import express from "express";
 import path from "path";
 // import sendNotifications from "../utils/send";
 import userModel from "../models/user.js";
+import webpush from "web-push";
 
 const app = express.Router();
 
-app.post("/subscribe", async (request, response) => {
-  console.log(`Subscribing ${request.body.endpoint}`);
+app.post("/subscribe", async (req, res) => {
+  //   console.log(`Subscribing ${req.body.endpoint}`);
 
-  const newSubscription = await userModel.create({ ...request.body });
+  const newSubscription = await userModel.create({ ...req.body });
+  console.log(newSubscription);
+  const test = {
+    endpoint:
+      "https://fcm.googleapis.com/fcm/send/dtSy3aV3ir8:APA91bFgYBE-us11WN-6zEpWduN7Cy6gMFAzoWE7n28KT-knJpiofkOyB39B6ZSb9kuJ6f17Bfd_wtCvFeYkvSGPpts-o00VskSqPzI_NJQMM5EdveuvBvGGMaStE58XkdRxAKUjB8WI",
+    expirationTime: null,
+    keys: {
+      p256dh:
+        "BE-3E5Ip8nf22Vegxh6rIY3mBs2zAKDEe9b2ILnLQNRv-wJXwdY65rbu6sB3zuozLUXnXuDt64PxFcXNfxWgCjw",
+      auth: "Xe-vJK3CUXiOFFbXi5NPTg",
+    },
+  };
 
   const options = {
     vapidDetails: {
       subject: "mailto:myemail@example.com",
-      publicKey: process.env.PUBLIC_KEY,
-      privateKey: process.env.PRIVATE_KEY,
+      publicKey: process.env.VAPID_PUBLIC_KEY,
+      privateKey: process.env.VAPID_PRIVATE_KEY,
     },
   };
   try {
-    const res2 = await webPush.sendNotification(
-      newSubscription,
+    await webpush.sendNotification(
+      test,
       JSON.stringify({
         title: "Hello from server",
         description: "this message is coming from the server",
@@ -28,14 +40,13 @@ app.post("/subscribe", async (request, response) => {
       }),
       options
     );
-    console.log(res2);
-    res.sendStatus(200);
+    // res.sendStatus(200);
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
   }
 
-  response.sendStatus(200);
+  res.sendStatus(200);
 });
 
 app.post("/remove-subscription", (request, response) => {
@@ -55,7 +66,8 @@ app.post("/notify-all", (request, response) => {
 
 app.get("/", (request, response) => {
   console.log(process.cwd());
-  response.sendFile(path.join(process.cwd(), "/views/index.html"));
+  res.render("index");
+  //   response.sendFile(path.join(process.cwd(), "index"));
 });
 
 export default app;

@@ -4,13 +4,14 @@ this.addEventListener("push", async function (event) {
   console.log({ message });
   await event.waitUntil(
     this.registration.showNotification(title, {
-      body: description,
-      icon: image,
       actions: [
         {
-          title: "say hi",
+          action: "archive",
+          title: "Archive",
         },
       ],
+      body: description,
+      icon: image,
     })
   );
 });
