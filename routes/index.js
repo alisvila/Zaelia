@@ -7,13 +7,13 @@ const app = express.Router();
 app.post("/subscribe", async (req, res) => {
   const username = req.body.username || "ali";
 
-  console.log(`Subscribing ${req.body.endpoint}`);
+  console.log(`Subscribing ${req.body.subscribe.endpoint}`);
   let oldOrNew;
 
   try {
     const newSubscription = new UserModel({
       username: "ali",
-      subscribe: { ...req.body },
+      subscribe: { ...req.body?.subscribe },
     });
     oldOrNew = await newSubscription.save();
   } catch (e) {
@@ -25,7 +25,7 @@ app.post("/subscribe", async (req, res) => {
 
   if (!oldOrNew.subscribe) {
     await UserModel.updateOne({
-      subscribe: { ...req.body },
+      subscribe: { ...req.body?.subscribe },
     });
   }
 
