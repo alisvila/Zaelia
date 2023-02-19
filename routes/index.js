@@ -8,7 +8,6 @@ app.post("/subscribe", async (req, res) => {
   const username = req.body.username || "ali";
 
   console.log(`Subscribing ${req.body.endpoint}`);
-  //   const newSubscription = await userModel.create({ ...req.body });
   let oldOrNew;
 
   try {
@@ -43,7 +42,6 @@ app.post("/subscribe", async (req, res) => {
 
 app.post("/remove-sub", async (request, response) => {
   const username = request.body.username || "ali";
-  //   const newSub = await UserModel.deleteOne({ username: /ali/i });
   const newSub = await UserModel.findOne({
     username: new RegExp(`${username}`, "i"),
   });
@@ -58,9 +56,32 @@ app.post("/remove-sub", async (request, response) => {
   response.status(200);
 });
 
-app.post("/notify-me", (request, response) => {
-  console.log(`Notifying ${request.body.endpoint}`);
-  response.status(200);
+app.post("/notify-me", async (req, res) => {
+  const username = req.body.username || "ali";
+  let foundUser;
+
+  try {
+    foundUser = await UserModel.findOne({
+      username: new RegExp(`${username}`, "i"),
+    });
+  } catch (e) {
+    // TODO: check for error code 11000 or sth
+    res.status(500).json(e);
+  }
+
+  if (!foundUser.subscribe) {
+    res.status(400).json({ error: "user dosent subscribe" });
+  }
+
+  try {
+    await sendNotifications(foundUser.subscribe, {
+      title: "hello",
+      description: "hello from server",
+    });
+    res.status(200).json(foundUser);
+  } catch (error) {
+    res.status(500).json(error);
+  }
 });
 
 app.post("/notify-all", async (request, response) => {
