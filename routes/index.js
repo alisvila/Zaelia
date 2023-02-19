@@ -35,9 +35,9 @@ app.post("/subscribe", async (req, res) => {
       title: "hello",
       description: "hello from server",
     });
-    res.sendStatus(200).json(oldOrNew);
+    res.status(200).json(oldOrNew);
   } catch (error) {
-    res.sendStatus(500).json(error);
+    res.status(500).json(error);
   }
 });
 
@@ -51,21 +51,30 @@ app.post("/remove-sub", async (request, response) => {
   try {
     await newSub.save();
   } catch (e) {
-    response.statusCode(500).json(e);
+    response.status(500).json(e);
   }
 
   console.log(`Unsubscribing ${request.body.endpoint}`);
-  response.sendStatus(200);
+  response.status(200);
 });
 
 app.post("/notify-me", (request, response) => {
   console.log(`Notifying ${request.body.endpoint}`);
-  response.sendStatus(200);
+  response.status(200);
 });
 
-app.post("/notify-all", (request, response) => {
+app.post("/notify-all", async (request, response) => {
+  const allWithSub = await UserModel.find({ subscribe: { $exists: true } });
   console.log("Notifying all subscribers");
-  response.sendStatus(200);
+
+  allWithSub.forEach((subscription) => {
+    sendNotifications(subscription.subscribe, {
+      title: "brodcast",
+      description: "server brodcast",
+    });
+  });
+
+  response.status(200).json(allWithSub);
 });
 
 app.get("/", (request, response) => {
